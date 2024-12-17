@@ -158,3 +158,6 @@ To have an endpoint that allows anyone to completely dump the API's database wit
 
 this will make any request to the `/api/posts` return at maximum 100 items per page, any request without page specification will return 25 items, users can pagenating by using the query params: `page`, `size` and `sort`.  
 A possible improvement would be add a similar mechnism to the `/api/posts/{id}` considering that one blog post can reach thousands of comments, it would be safer to make user paginate accross the comment list
+
+### 5. Logging
+It would be important to add log records to monitor and diagnose the system's behavior, in the current state any bug undetected in the tests will have very little rastreability... logs would help to detect and find the root cause of eventual bugs
