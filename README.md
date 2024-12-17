@@ -97,7 +97,8 @@ The API has endpoints to manage these actions in a clean and simple way using Sp
 - **Java 11+**
 - **Spring Boot** for building the REST API
 - **Spring Data JPA** for database operations
-- **H2 Database** for in-memory database
+- **H2 Database**  
+For the project's purpose I found simpler to configure the database in-memory, to have a persistent database you just need to set the `spring.datasource.url=jdbc:h2:file:./data/testdb` in the `application.properties`
 - **Maven** for build and dependency management
 
 ---
@@ -132,3 +133,28 @@ cd built
 java -jar java-blog-application-1.0.0.jar --spring.profiles.active=dev
 ```
 
+## Possible upgrades
+Considering the purpose of this project I dedicated no more than 4 hours for its execution, therefore there are multiple optimizations possible for this project
+
+### 1. Creation of a CI/CD pipeline
+#### A) Automated tests
+Any production-level project should have at least one pipeline to run automated tests and guarantee that commited code performs as intended.
+
+#### B) Build and publish Docker image
+I took the liberty of creating a `Dockerfile` for this project, which means this project is ready to be containerized. Thus, a pipeline that automates the build and publishing of a Docker image for this project would be a great extension, allowing fast deployment to a production server.
+
+### 2. Use Spring Security for access control
+In the current form, anyone can post, comment, and read the posts in the blog. By taking advantage of Spring Security, it would be easy to add an access control layer to better manage the privacy of the API data.  
+I took the liberty of adding the autoditory fields to the domain classes, and by adding the necessary Spring Security configurations, the blog posts and comments would have their respective fields automatically filled.
+
+### 3. Use Spring Actuator for api health status
+I took liberty to include `spring-boot-starter-actuator` as the project's dependency, then spring will automatically populate a set of metrics for monitory the system's health at `http://localhost/actuator/`.  
+However I didn't create any specific metric to monitore the api, hence the creation of timers and counters would allow the devops team to continously monitore the system's performance and health 
+
+### 4. Pagination control
+To have an endpoint that allows anyone to completely dump the API's database with one request is a huge risk to any system, to prevent this I included in the `application.propeties` file the fields:  
+* spring.data.web.pageable.default-page-size=25
+* spring.data.web.pageable.max-page-size=100
+
+this will make any request to the `/api/posts` return at maximum 100 items per page, any request without page specification will return 25 items, users can pagenating by using the query params: `page`, `size` and `sort`.  
+A possible improvement would be add a similar mechnism to the `/api/posts/{id}` considering that one blog post can reach thousands of comments, it would be safer to make user paginate accross the comment list
